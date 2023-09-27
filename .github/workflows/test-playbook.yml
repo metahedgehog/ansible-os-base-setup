@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-       - name: Modify /etc/hosts
+      - name: Modify /etc/hosts
         uses: jaywcjlove/github-action-modify-file-content@main
         with:
-          path: ~/.ssh/config
+          path: /root/.ssh/config
           body: "StrictHostKeyChecking no"
           
       - name: Set up Python
