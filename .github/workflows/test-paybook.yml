@@ -19,21 +19,21 @@ jobs:
 
       - name: Install Ansible
         run: pip install ansible
-
-      - name: Test Ansible Playbook on RHEL-based
-        run: |
-          ansible-playbook -i inventory.txt setup-system.yml --limit centos
-          # Check if the user is a member of the sudo group
-          ansible-playbook -i inventory.txt -m user.info -a 'username=my_user groups=sudo' -l centos
           
       - name: Test Ansible Playbook on Debian
         run: |
-          ansible-playbook -i inventory.txt setup-system.yml --limit debian
+          ansible-playbook -i inventory.ini setup-system.yml --limit debian
           # Check if the user is a member of the sudo group
           ansible-playbook -i inventory.txt -m user.info -a 'username=my_user groups=sudo' -l debian
 
       - name: Test Ansible Playbook on Ubuntu
         run: |
-          ansible-playbook -i inventory.txt setup-system.yml --limit ubuntu
+          ansible-playbook -i inventory.ini setup-system.yml --limit ubuntu
           # Check if the user is a member of the sudo group
           ansible-playbook -i inventory.txt -m user.info -a 'username=my_user groups=sudo' -l ubuntu
+
+      - name: Test Ansible Playbook on RHEL-based
+        run: |
+          ansible-playbook -i inventory.ini setup-system.yml --limit centos
+          # Check if the user is a member of the sudo group
+          ansible-playbook -i inventory.txt -m user.info -a 'username=my_user groups=sudo' -l centos
