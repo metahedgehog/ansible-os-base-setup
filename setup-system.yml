@@ -1,0 +1,127 @@
+---
+- name: Configure Debian Server
+  hosts: all 
+  become: yes
+  tasks:
+
+# UPDATE PACKAGES
+# ---------------------------------------------------------------------------------# 
+
+    - name: Disable host key checking
+      ansible.builtin.lineinfile:
+        path: ~/.ssh/config
+        line: 'StrictHostKeyChecking no'
+    
+    # this step could be needed for Debian
+    - name: Remove Physical Source
+      command:
+        sed -E -i '/DVD|cdrom/ s/^/#/' /etc/apt/sources.list
+      when: ansible_distribution == "Debian"
+  
+    - name: Update Packages (Debian, Debian-based)
+      apt:
+        update_cache: yes
+      when: ansible_distribution in ['Debian', 'Ubuntu']
+    
+    - name: Update Packages (RHEL-based)
+      dnf:
+        update_cache: yes
+      when: ansible_distribution in ['CentOS', 'Fedora', 'Rocky', 'Alma']"
+# ---------------------------------------------------------------------------------#
+   
+
+# GET RANDOM USERNAME
+# ---------------------------------------------------------------------------------#
+    - name: Get random word
+      uri:
+        url: https://random-user-name.azurewebsites.net/
+        return_content: yes
+      register: random_word
+    
+    - name: Set username variable
+      set_fact:
+        username: "{{ random_word.content }}"
+# ---------------------------------------------------------------------------------#
+
+
+# CREATE A USER
+# ---------------------------------------------------------------------------------#
+  tasks:
+    - name: Create a User
+      user:
+        name: "{{ username }}"
+        createhome: yes
+        home: /home/{{ username }}
+
+    - name: Set login shell for User
+      user:
+        name: "{{ username }}"
+        shell: /bin/bash
+# ---------------------------------------------------------------------------------#
+
+
+# CREATE A PASSWORD FOR THE USER
+# ---------------------------------------------------------------------------------#
+    - name: Set the Password for the User
+      ansible.builtin.shell:
+        cmd: echo "{{ username }}:{{ upassword }}" | chpasswd
+# ---------------------------------------------------------------------------------#
+
+
+# INSTALL SUDO
+# ---------------------------------------------------------------------------------#
+    - name: Install sudo for Debian and Debian-based
+      apt:
+        name: sudo
+      when: ansible_distribution in ['Debian', 'Ubuntu']
+
+    - name: Install sudo for RHEL-based
+      dnf:
+        name: sudo
+      when: ansible_distribution in ['CentOS', 'Fedora', 'Rocky', 'Alma']
+# ---------------------------------------------------------------------------------#
+
+
+# ADD USER TO SUDO
+# ---------------------------------------------------------------------------------#
+    - name: Add User to Administrative Group (Debian and Debian-based)
+      user:
+        name: "{{ username }}" 
+        groups: sudo
+
+    - name: Add User to Administrative Group (RHEL-based)
+      user:
+        name: "{{ username }}"
+        groups: wheel  
+      when: ansible_distribution in ['CentOS', 'Fedora', 'Rocky', 'Alma']
+# ---------------------------------------------------------------------------------#
+
+
+# INSTALL UFW (Debian-based)
+# ---------------------------------------------------------------------------------#
+    - name: Install Firewall and Configure SSH access (Debian and Debian-based)
+      apt:
+        name: ufw
+        state: latest
+      when: ansible_distribution in ['Debian', 'Ubuntu']
+
+    - name: Allow SSH through UFW
+      ufw:
+        rule: allow
+        port: 22
+      when: ansible_distribution in ['Debian', 'Ubuntu']
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+        policy: allow
+      when: ansible_distribution in ['Debian', 'Ubuntu']
+# ---------------------------------------------------------------------------------#
+        
+
+# SEE USERNAME
+# ---------------------------------------------------------------------------------#
+    - name: Display result
+      debug:
+        msg: "ADDRESS: {{ ansible_host }} | USERNAME: {{ username }}"
+# ---------------------------------------------------------------------------------#
