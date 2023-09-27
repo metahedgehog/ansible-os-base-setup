@@ -12,6 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+       - name: Modify /etc/hosts
+        uses: jaywcjlove/github-action-modify-file-content@main
+        with:
+          path: ~/.ssh/config
+          body: "StrictHostKeyChecking no"
+          
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
@@ -20,11 +26,6 @@ jobs:
       - name: Install Ansible
         run: pip install ansible
 
-      - name: Modify /etc/hosts
-        uses: jaywcjlove/github-action-modify-file-content@main
-        with:
-          path: /etc/hosts
-          body: "127.0.0.1 localhost"
 
       - name: Test Ansible Playbook on Ubuntu
         run: |
