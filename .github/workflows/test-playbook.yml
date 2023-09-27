@@ -20,10 +20,11 @@ jobs:
       - name: Install Ansible
         run: pip install ansible
 
-      - name: Disable SSH Host Key Checking
-        ansible.builtin.lineinfile:
-          path: ~/.ssh/config
-          line: 'StrictHostKeyChecking no'
+      - name: Modify /etc/hosts
+        uses: jaywcjlove/github-action-modify-file-content@main
+        with:
+          path: /etc/hosts
+          body: "127.0.0.1 localhost"
 
       - name: Test Ansible Playbook on Ubuntu
         run: |
