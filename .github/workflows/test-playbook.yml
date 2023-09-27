@@ -12,11 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Modify /etc/hosts
-        uses: jaywcjlove/github-action-modify-file-content@main
+      - name: Disable known hosts
+        uses: jaywcjlove/github-action-create-file@main
         with:
           path: /root/.ssh/config
-          body: "StrictHostKeyChecking no"
+          content: "StrictHostKeyChecking no"
           
       - name: Set up Python
         uses: actions/setup-python@v3
