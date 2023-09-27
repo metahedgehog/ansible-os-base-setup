@@ -13,10 +13,10 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Disable known hosts
-        uses: jaywcjlove/github-action-create-file@main
-        with:
-          path: /root/.ssh/config
-          content: "StrictHostKeyChecking no"
+        uses: "finnp/create-file-action@master"
+        env:
+          FILE_NAME: "/root/.ssh/config"
+          FILE_DATA: "Host * StrictHostKeyChecking no"
           
       - name: Set up Python
         uses: actions/setup-python@v3
