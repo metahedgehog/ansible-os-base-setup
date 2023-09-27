@@ -12,11 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Disable SSH Host Key Checking
-        ansible.builtin.lineinfile:
-          path: ~/.ssh/config
-          line: 'StrictHostKeyChecking no'
-
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
